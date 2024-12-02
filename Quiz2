@@ -1,1 +1,36 @@
+[
+  {
+    "id": 1,
+    "question": "คำถามที่ 1: Vue.js คืออะไร?",
+    "options": [
+      "JavaScript Framework",
+      "CSS Framework",
+      "HTML Framework",
+      "Python Library"
+    ],
+    "correctAnswer": "JavaScript Framework"
+  },
+  {
+    "id": 2,
+    "question": "คำถามที่ 2: Vue.js ใช้ทำอะไร?",
+    "options": [
+      "สร้างเว็บไซต์",
+      "ออกแบบกราฟิก",
+      "จัดการฐานข้อมูล",
+      "เขียนเกม"
+    ],
+    "correctAnswer": "สร้างเว็บไซต์"
+  },
+  {
+    "id": 3,
+    "question": "คำถามที่ 3: JavaScript ใช้ทำอะไร?",
+    "options": [
+      "สร้างเว็บไซต์",
+      "จัดการฐานข้อมูล",
+      "เขียนโปรแกรมคำนวณ",
+      "ออกแบบ UI"
+    ],
+    "correctAnswer": "สร้างเว็บไซต์"
+  }
+]
 
