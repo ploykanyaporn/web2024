@@ -5,81 +5,7 @@
       <p>เลือกวิชาและเริ่มทำแบบทดสอบ</p>
       <button @click="startExam">เริ่มทำแบบทดสอบ</button>
     </div>
-    <script>
-        $(function() {
-          let totalQuestions = 0;
-      
-          $("#quizBox").hide();
-      
-          $("#btnStart").click(function() {
-            $("#startBox").hide();
-            $("#quizBox").show();
-            loadQuiz();
-          });
-      
-          function loadQuiz() {
-            $.getJSON("quiz.json", function(data) {
-              totalQuestions = data.length;
-              let quizListHtml = "";
-      
-              $.each(data, function(index, quiz) {
-                let no = index + 1;
-                quizListHtml += `
-                  <div class="card mb-3">
-                    <div class="card-body">
-                      <h5 class="card-title">Question ${no}</h5>
-                      <p class="card-text">${quiz.title}</p>`;
-                $.each(quiz.options, function(optionIndex, option) {
-                  quizListHtml += `
-                    <div class="form-check">
-                      <input class="form-check-input quiz-option" type="radio" name="q${no}" value="${optionIndex + 1}">
-                      <label class="form-check-label">${option}</label>
-                    </div>`;
-                });
-                quizListHtml += "</div></div>";
-              });
-      
-              $("#quizListBox").html(quizListHtml);
-      
-              $(".quiz-option").change(function() {
-                checkAllAnswered();
-              });
-            });
-          }
-      
-          function checkAllAnswered() {
-            let answered = 0;
-            for (let i = 1; i <= totalQuestions; i++) {
-              if ($(`input[name='q${i}']:checked`).length > 0) {
-                answered++;
-              }
-            }
-      
-            let progress = Math.round((answered / totalQuestions) * 100);
-            $("#progressBar").css("width", `${progress}%`).text(`${progress}%`);
-      
-            if (answered === totalQuestions) {
-              $("#btnCheckAnswer").prop("disabled", false);
-            }
-          }
-      
-          $("#btnCheckAnswer").click(function() {
-            $.getJSON("quiz.json", function(data) {
-              let score = 0;
-      
-              $.each(data, function(index, quiz) {
-                let no = index + 1;
-                let selectedAnswer = $(`input[name='q${no}']:checked`).val();
-                if (parseInt(selectedAnswer) === quiz.answer) {
-                  score++;
-                }
-              });
-      
-              $("#resultBox").html(`<div class="result-box">Your Score: ${score}/${totalQuestions}</div>`);
-            });
-          });
-        });
-      </script>
+
     <div v-if="started && !completed">
       <h2>{{ currentQuestion.question }}</h2>
       <div v-for="(option, index) in currentQuestion.options" :key="index">
@@ -172,4 +98,3 @@ label {
   margin: 10px 0;
 }
 </style>
-
