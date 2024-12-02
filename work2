@@ -1,1 +1,175 @@
+<template>
+  <div id="app">
+    <div v-if="!started">
+      <h1>ยินดีต้อนรับสู่แบบทดสอบ Vue.js</h1>
+      <p>เลือกวิชาและเริ่มทำแบบทดสอบ</p>
+      <button @click="startExam">เริ่มทำแบบทดสอบ</button>
+    </div>
+    <script>
+        $(function() {
+          let totalQuestions = 0;
+      
+          $("#quizBox").hide();
+      
+          $("#btnStart").click(function() {
+            $("#startBox").hide();
+            $("#quizBox").show();
+            loadQuiz();
+          });
+      
+          function loadQuiz() {
+            $.getJSON("quiz.json", function(data) {
+              totalQuestions = data.length;
+              let quizListHtml = "";
+      
+              $.each(data, function(index, quiz) {
+                let no = index + 1;
+                quizListHtml += `
+                  <div class="card mb-3">
+                    <div class="card-body">
+                      <h5 class="card-title">Question ${no}</h5>
+                      <p class="card-text">${quiz.title}</p>`;
+                $.each(quiz.options, function(optionIndex, option) {
+                  quizListHtml += `
+                    <div class="form-check">
+                      <input class="form-check-input quiz-option" type="radio" name="q${no}" value="${optionIndex + 1}">
+                      <label class="form-check-label">${option}</label>
+                    </div>`;
+                });
+                quizListHtml += "</div></div>";
+              });
+      
+              $("#quizListBox").html(quizListHtml);
+      
+              $(".quiz-option").change(function() {
+                checkAllAnswered();
+              });
+            });
+          }
+      
+          function checkAllAnswered() {
+            let answered = 0;
+            for (let i = 1; i <= totalQuestions; i++) {
+              if ($(`input[name='q${i}']:checked`).length > 0) {
+                answered++;
+              }
+            }
+      
+            let progress = Math.round((answered / totalQuestions) * 100);
+            $("#progressBar").css("width", `${progress}%`).text(`${progress}%`);
+      
+            if (answered === totalQuestions) {
+              $("#btnCheckAnswer").prop("disabled", false);
+            }
+          }
+      
+          $("#btnCheckAnswer").click(function() {
+            $.getJSON("quiz.json", function(data) {
+              let score = 0;
+      
+              $.each(data, function(index, quiz) {
+                let no = index + 1;
+                let selectedAnswer = $(`input[name='q${no}']:checked`).val();
+                if (parseInt(selectedAnswer) === quiz.answer) {
+                  score++;
+                }
+              });
+      
+              $("#resultBox").html(`<div class="result-box">Your Score: ${score}/${totalQuestions}</div>`);
+            });
+          });
+        });
+      </script>
+    <div v-if="started && !completed">
+      <h2>{{ currentQuestion.question }}</h2>
+      <div v-for="(option, index) in currentQuestion.options" :key="index">
+        <input type="radio" :name="currentQuestion.id" :value="option" v-model="answers[currentQuestion.id]" />
+        <label>{{ option }}</label>
+      </div>
+      <button @click="nextQuestion" :disabled="!answers[currentQuestion.id]">ถัดไป</button>
+    </div>
+
+    <div v-if="completed">
+      <h2>คะแนน: {{ score }} / {{ questions.length }}</h2>
+      <button @click="restartExam">เริ่มใหม่</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+
+export default {
+  name: "App",
+  data() {
+    return {
+      questions: [],
+      currentQuestionIndex: 0,
+      answers: {},
+      started: false,
+      completed: false,
+      score: 0
+    };
+  },
+  computed: {
+    currentQuestion() {
+      return this.questions[this.currentQuestionIndex];
+    }
+  },
+  methods: {
+    async loadQuestions() {
+      try {
+        const response = await axios.get("/path/to/your/questions.json");
+        this.questions = response.data;
+      } catch (error) {
+        console.error("Error loading questions:", error);
+      }
+    },
+    startExam() {
+      this.started = true;
+      this.loadQuestions();
+    },
+    nextQuestion() {
+      if (this.answers[this.currentQuestion.id] === this.currentQuestion.correctAnswer) {
+        this.score++;
+      }
+      this.currentQuestionIndex++;
+      if (this.currentQuestionIndex >= this.questions.length) {
+        this.completed = true;
+      }
+    },
+    restartExam() {
+      this.started = false;
+      this.completed = false;
+      this.currentQuestionIndex = 0;
+      this.answers = {};
+      this.score = 0;
+    }
+  }
+};
+</script>
+
+<style>
+/* Styling for the exam */
+#app {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+h2 {
+  margin-top: 20px;
+}
+
+label {
+  display: block;
+  margin: 10px 0;
+}
+</style>
 
