@@ -1,100 +1,310 @@
-<template>
-  <div id="app">
-    <div v-if="!started">
-      <h1>ยินดีต้อนรับสู่แบบทดสอบ Vue.js</h1>
-      <p>เลือกวิชาและเริ่มทำแบบทดสอบ</p>
-      <button @click="startExam">เริ่มทำแบบทดสอบ</button>
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.7.4/dist/vuetify.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.7.4/dist/vuetify.min.css" rel="stylesheet" />
+    <title>แบบทดสอบ</title>
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <h1>แบบทดสอบ</h1>
+            
+            <!-- ปุ่มสำหรับโหลดแบบทดสอบ -->
+            <v-btn @click="loadQuiz">โหลดแบบทดสอบ</v-btn>
+
+            <!-- แสดงแบบทดสอบ -->
+            <div v-if="quizData.length > 0">
+                <div v-for="(quiz, index) in quizData" :key="index">
+                    <h3>{{ index + 1 }}. {{ quiz.title }}</h3>
+                    <ul>
+                        <li v-for="(option, i) in quiz.options" :key="i">
+                            <input type="radio" :name="'question' + index" :value="i + 1" v-model="answers[index]"> {{ i + 1 }}. {{ option }}
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- ปุ่มตรวจคำตอบ -->
+                <v-btn color="primary" @click="checkAnswers">ตรวจคำตอบ</v-btn>
+            </div>
+
+            <!-- แสดงคะแนน -->
+            <div v-if="showScore">
+                <h2>คุณได้คะแนน {{ score }} จาก {{ quizData.length }} คะแนน</h2>
+            </div>
+        </v-app>
     </div>
 
-    <div v-if="started && !completed">
-      <h2>{{ currentQuestion.question }}</h2>
-      <div v-for="(option, index) in currentQuestion.options" :key="index">
-        <input type="radio" :name="currentQuestion.id" :value="option" v-model="answers[currentQuestion.id]" />
-        <label>{{ option }}</label>
-      </div>
-      <button @click="nextQuestion" :disabled="!answers[currentQuestion.id]">ถัดไป</button>
-    </div>
+    <script>
+        const { createApp } = Vue;
+        const { createVuetify } = Vuetify;
 
-    <div v-if="completed">
-      <h2>คะแนน: {{ score }} / {{ questions.length }}</h2>
-      <button @click="restartExam">เริ่มใหม่</button>
-    </div>
-  </div>
-</template>
+        const vuetify = createVuetify();
 
-<script>
-import axios from "axios";
-
-export default {
-  name: "App",
-  data() {
-    return {
-      questions: [],
-      currentQuestionIndex: 0,
-      answers: {},
-      started: false,
-      completed: false,
-      score: 0
-    };
+        const app = createApp({
+            data() {
+                return {
+                    // ข้อมูลแบบทดสอบ
+                    quizData: [],
+                    answers: [],  // เก็บคำตอบของผู้ใช้
+                    score: 0,
+                    showScore: false
+                };
+            },
+            methods: {
+                // ฟังก์ชันโหลดข้อมูลแบบทดสอบ
+                loadQuiz() {
+                    this.quizData = [
+                    
+  {
+    "title": "ลำธารไหลผ่านหมู่บ้านแห่งหนึ่ง เป็นลำธารที่สำคัญที่ช่วยหล่อเลี้ยงชีวิตของผู้คนในหมู่บ้าน ลำธารมีสีน้ำที่ใสสะอาด จนสามารถสังเกตเห็นก้อนกรวดใต้ลำธารได้ชัดเจน ภายในลำธารพบสิ่งมีชีวิตมากมาย ไม่ว่าจะเป็นปลาหลากชนิดที่แหวกว่าย เหงือกขยับคอยรับออกซิเจนจากน้ำ บ้างก็หลบอยู่ใต้หินเพื่อรอเหยื่อ หอยน้ำจืดหลากสีที่กำลังคืบคลานหาอาหารริมลำธาร ตัวอ่อนแมลงปอที่อำพลางตัวจนกลมกลืนกับพืชน้ำเพื่อหลบผู้ล่า <br>คำว่า ลำธาร ในข้อความมีความสอดคล้องข้อใดมากที่สุด",
+    "options": [
+      "ประชากร",
+      "แหล่งที่อยู่",
+      "ชีวภูมิภาค",
+      "ระบบนิเวศ",
+      "กลุ่มสิ่งมีชีวิต"
+    ],
+    "answer": 4
   },
-  computed: {
-    currentQuestion() {
-      return this.questions[this.currentQuestionIndex];
-    }
+  {
+    "title": "สภาพแวดล้อมของโลกที่มีสิ่งมีชีวิตอาศัยอยู่ เช่น ป่า ทุ่งหญ้า หรือทะเล เรียกว่าอะไร",
+    "options": [
+      "ระบบนิเวศ",
+      "แหล่งที่อยู่",
+      "ชีวภูมิภาค",
+      "สภาพภูมิอากาศ",
+      "กลุ่มสิ่งมีชีวิต"
+    ],
+    "answer": 1
   },
-  methods: {
-    async loadQuestions() {
-      try {
-        const response = await axios.get("/path/to/your/questions.json");
-        this.questions = response.data;
-      } catch (error) {
-        console.error("Error loading questions:", error);
-      }
-    },
-    startExam() {
-      this.started = true;
-      this.loadQuestions();
-    },
-    nextQuestion() {
-      if (this.answers[this.currentQuestion.id] === this.currentQuestion.correctAnswer) {
-        this.score++;
-      }
-      this.currentQuestionIndex++;
-      if (this.currentQuestionIndex >= this.questions.length) {
-        this.completed = true;
-      }
-    },
-    restartExam() {
-      this.started = false;
-      this.completed = false;
-      this.currentQuestionIndex = 0;
-      this.answers = {};
-      this.score = 0;
-    }
+  {
+    "title": "ข้อใดที่ไม่ใช่ปัจจัยที่มีผลต่อการเจริญเติบโตของพืช",
+    "options": [
+      "แสง",
+      "น้ำ",
+      "ดิน",
+      "จำนวนประชากร",
+      "อุณหภูมิ"
+    ],
+    "answer": 3
+  },
+  {
+    "title": "ปัจจัยใดที่ทำให้ประชากรของสัตว์บางชนิดลดลง",
+    "options": [
+      "การขยายพันธุ์",
+      "การสูญเสียแหล่งที่อยู่อาศัย",
+      "การย้ายถิ่น",
+      "การเพิ่มขึ้นของอาหาร",
+      "การเปลี่ยนแปลงสภาพภูมิอากาศ"
+    ],
+    "answer": 2
+  },
+  {
+    "title": "สัตว์ชนิดใดที่สามารถปรับตัวได้ดีในสถานที่ที่มีอากาศหนาวเย็น",
+    "options": [
+      "ช้าง",
+      "หมีขาว",
+      "สิงโต",
+      "นกเพนกวิน",
+      "กระรอก"
+    ],
+    "answer": 2
+  },
+  {
+    "title": "คำว่า 'บรรยากาศ' หมายถึงอะไร",
+    "options": [
+      "อากาศ",
+      "ชั้นของโลก",
+      "สิ่งมีชีวิต",
+      "พื้นที่เฉพาะ",
+      "พื้นดิน"
+    ],
+    "answer": 1
+  },
+  {
+    "title": "สิ่งที่มีชีวิตในป่าฝนเขตร้อนส่วนใหญ่ต้องการอะไรในการเจริญเติบโต",
+    "options": [
+      "แสงแดด",
+      "น้ำ",
+      "อากาศ",
+      "สารอาหารจากดิน",
+      "ทุกข้อข้างต้น"
+    ],
+    "answer": 5
+  },
+  {
+    "title": "ถ้าพบว่ามีการขาดแคลนอาหารในระบบนิเวศใด ระบบนิเวศนั้นจะเกิดการเปลี่ยนแปลงอย่างไร",
+    "options": [
+      "สิ่งมีชีวิตบางชนิดจะสูญพันธุ์",
+      "ประชากรจะเพิ่มจำนวน",
+      "สัตว์จะย้ายถิ่น",
+      "ระบบนิเวศจะมีการเจริญเติบโต",
+      "ไม่เกิดการเปลี่ยนแปลง"
+    ],
+    "answer": 1
+  },
+  {
+    "title": "ปัจจัยใดที่ช่วยให้สัตว์สามารถปรับตัวได้ดีในภูมิภาคที่มีฤดูหนาว",
+    "options": [
+      "การเก็บไขมัน",
+      "การหลบหนาว",
+      "การขยายพันธุ์เร็ว",
+      "การย้ายถิ่น",
+      "การลดการหายใจ"
+    ],
+    "answer": 1
+  },
+  {
+    "title": "สิ่งมีชีวิตที่อาศัยอยู่ในทะเลลึกและไม่ได้รับแสงแดดเรียกว่าอะไร",
+    "options": [
+      "สัตว์ทะเลลึก",
+      "สัตว์น้ำปกติ",
+      "สัตว์พื้นดิน",
+      "สัตว์ทะเลทั่วไป",
+      "สัตว์น้ำเค็ม"
+    ],
+    "answer": 1
+  },
+  {
+    "title": "การที่สิ่งมีชีวิตบางชนิดสามารถอยู่รอดในสถานที่แห้งแล้งได้ เกิดจากอะไร",
+    "options": [
+      "การปรับตัวทางกายภาพ",
+      "การเปลี่ยนแปลงภูมิอากาศ",
+      "การย้ายถิ่น",
+      "การหาแหล่งอาหาร",
+      "การเก็บน้ำ"
+    ],
+    "answer": 1
+  },
+  {
+    "title": "การจัดหมวดหมู่สิ่งมีชีวิตที่มีลักษณะทางชีวภาพเหมือนกันเรียกว่าอะไร",
+    "options": [
+      "ชนิด",
+      "ประเภท",
+      "กลุ่ม",
+      "สายพันธุ์",
+      "ระบบนิเวศ"
+    ],
+    "answer": 4
+  },
+  {
+    "title": "ปัจจัยใดที่ไม่ใช่ปัจจัยที่มีผลต่อการเปลี่ยนแปลงของระบบนิเวศ",
+    "options": [
+      "อุณหภูมิ",
+      "ความชื้น",
+      "แสง",
+      "จำนวนสิ่งมีชีวิต",
+      "ระยะเวลา"
+    ],
+    "answer": 5
+  },
+  {
+    "title": "ทำไมบางชนิดของพืชถึงสามารถเติบโตในพื้นที่ที่มีแสงน้อย",
+    "options": [
+      "เพราะพวกมันมีสีเขียว",
+      "เพราะพวกมันสามารถเก็บแสงได้มากขึ้น",
+      "เพราะพวกมันมีรากยาว",
+      "เพราะพวกมันมีดอกสีขาว",
+      "เพราะพวกมันสามารถใช้สารอาหารจากดิน"
+    ],
+    "answer": 2
+  },
+  {
+    "title": "แหล่งที่อยู่อาศัยของสิ่งมีชีวิตในทะเลเรียกว่าอะไร",
+    "options": [
+      "หาดทราย",
+      "ปะการัง",
+      "ทะเลสาบ",
+      "ทุ่งหญ้า",
+      "บริเวณลึก"
+    ],
+    "answer": 2
+  },
+  {
+    "title": "การพัฒนาของสัตว์ตามการเปลี่ยนแปลงของสิ่งแวดล้อม เรียกว่าอะไร",
+    "options": [
+      "วิวัฒนาการ",
+      "การจำลอง",
+      "การปรับตัว",
+      "การขยายพันธุ์",
+      "การปกป้อง"
+    ],
+    "answer": 1
+  },
+  {
+    "title": "ข้อใดไม่ใช่ปัจจัยที่ส่งผลต่อการขยายพันธุ์ของพืช",
+    "options": [
+      "สภาพดิน",
+      "แสงแดด",
+      "น้ำ",
+      "การปนเปื้อน",
+      "อุณหภูมิ"
+    ],
+    "answer": 4
+  },
+  {
+    "title": "ระบบนิเวศใดที่มีความหลากหลายทางชีวภาพมากที่สุด",
+    "options": [
+      "ป่าฝน",
+      "ทะเลทราย",
+      "ทุ่งหญ้า",
+      "ทุ่งดอกไม้",
+      "ป่าดงดิบ"
+    ],
+    "answer": 1
+  },
+  {
+    "title": "สิ่งที่มีชีวิตในพื้นที่ชนบทมักปรับตัวอย่างไรในช่วงฤดูหนาว",
+    "options": [
+      "หลบหนาว",
+      "ย้ายถิ่น",
+      "ขยายพันธุ์",
+      "หยุดหายใจ",
+      "เก็บอาหาร"
+    ],
+    "answer": 1
+  },
+  {
+    "title": "สิ่งมีชีวิตที่อาศัยอยู่ในทะเลลึกที่ไม่ได้รับแสงแดด สามารถอยู่รอดได้ด้วยการใช้แหล่งพลังงานจากไหน",
+    "options": [
+      "พลังงานจากแสง",
+      "พลังงานจากน้ำ",
+      "พลังงานจากการเผาผลาญ",
+      "พลังงานจากแร่ธาตุ",
+      "พลังงานจากอากาศ"
+    ],
+    "answer": 4
   }
-};
-</script>
+                
 
-<style>
-/* Styling for the exam */
-#app {
-  text-align: center;
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
+                    ];
 
-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-}
+                    // กำหนดคำตอบเริ่มต้นให้ทุกข้อเป็น null
+                    this.answers = Array(this.quizData.length).fill(null);
+                },
+                // ฟังก์ชันตรวจคำตอบ
+                checkAnswers() {
+                    let score = 0;
+                    this.quizData.forEach((quiz, index) => {
+                        if (this.answers[index] === quiz.answer) {
+                            score++;
+                        }
+                    });
+                    this.score = score;
+                    this.showScore = true;
+                }
+            }
+        });
 
-h2 {
-  margin-top: 20px;
-}
+        app.use(vuetify).mount('#app');
+    </script>
 
-label {
-  display: block;
-  margin: 10px 0;
-}
-</style>
+</body>
+</html>
