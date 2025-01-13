@@ -1,38 +1,54 @@
-<!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
-</head>
-
-<body>
+  <head>
+    <title>360° Image Browser</title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  </head>
+  <body>
     <a-scene>
-        <!-- โหลดไฟล์โมเดลและเสียง -->
-        <a-assets>
-            <a-asset-item id="snowman-model" src="Snowman.glb"></a-asset-item>
-            <a-asset-item id="image-model" src="Image.glb"></a-asset-item>
-            <audio id="frog-sound" src="frog-laughing-meme.mp3"></audio>
-        </a-assets>
+      <a-assets>
+        <audio id="click-sound" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>
 
-        <!-- ข้อความ -->
-        <a-text value="653380195-1" position="0 1 -10" color="#00ff94" width="20" align="center"></a-text>
-        <a-text value="Naton Chanhom" position="0 -1 -10" color="#e5d137" width="18" align="center"></a-text>
-        <a-text value="I am a third-year student at Khon Kaen University." position="0 -3 -10" color="#04efef"
-            width="18" align="center"></a-text>
+        <!-- Images -->
+        <img id="city" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg">
+        <img id="city-thumb" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-city.jpg">
+        <img id="cubes" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/cubes.jpg">
+        <img id="cubes-thumb" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-cubes.jpg">
+        <img id="sechelt" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/sechelt.jpg">
+        <img id="sechelt-thumb" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-sechelt.jpg">
+        
+        <!-- 3D Model -->
+        <a-asset-item id="3d-model" src="http://localhost:8000/Snowman.glb"></a-asset-item> <!-- เปลี่ยน URL ของโมเดลที่นี่ -->
+      </a-assets>
 
-        <!-- โมเดล Snowman -->
-        <a-entity gltf-model="#snowman-model" position="0 1 0" scale="3 3 3"
-            animation__rotate="property: rotation; to: -360 0 0; loop: true; easing: linear; dur: 5000"
-            sound="src: #frog-sound; autoplay: true; volume: 3;">
-        </a-entity>
+      <!-- 360-degree image -->
+      <a-sky id="image-360" radius="10" src="#city"></a-sky>
 
-        <!-- โมเดล Image -->
-        <a-entity gltf-model="#image-model" position="0 1 0" scale="5 5 5"
-            animation__rotate="property: rotation; to: -360 0 0; loop: true; easing: linear; dur: 1000">
-        </a-entity>
+     
+     
+
+      <!-- เพิ่มข้อความ -->
+      <a-text value="653380319-9 KANYAPORN PHIWNUAL sec2 " position="0 2 -4" color="white" align="center" width="6"></a-text>
+
+      <!-- แสดงโมเดล 3D -->
+      <a-entity 
+        gltf-model="#3d-model"  <!-- เชื่อมต่อกับโมเดลที่โหลด -->
+        scale="2 2 2"  <!-- ปรับขนาด -->
+        position="0 1 -3"  <!-- วางตำแหน่ง -->
+        rotation="0 45 0"  <!-- หมุน -->
+      ></a-entity>
+
+      <!-- Link template we will build. -->
+      <a-entity class="link"></a-entity>
+ <a-entity gltf-model="Snowman.glb" position="0 1 0" scale="2 2 2"></a-entity>
     </a-scene>
-</body>
-
+      <!-- Camera + Cursor -->
+      <a-camera>
+        <a-cursor
+          id="cursor"
+          animation__click="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; easing: easeInCubic; dur: 150; startEvents: click"
+          animation__clickreset="property: scale; to: 0.1 0.1 0.1; dur: 1; startEvents: animationcomplete__click"
+          animation__fusing="property: scale; from: 1 1 1; to: 0.1 0.1 0.1; easing: easeInCubic; dur: 150; startEvents: fusing"></a-cursor>
+      </a-camera>
+    </a-scene>
+  </body>
 </html>
