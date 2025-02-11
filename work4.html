@@ -17,28 +17,23 @@
         <img id="sechelt-thumb" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-sechelt.jpg">
         
         <!-- 3D Model -->
-        <a-asset-item id="3d-model" src="http://localhost:8000/Snowman.glb"></a-asset-item>
+        <a-asset-item id="3d-model" src="Snowman.glb"></a-asset-item> <!-- เปลี่ยน URL ของโมเดลที่นี่ -->
       </a-assets>
+     
 
       <!-- 360-degree image -->
       <a-sky id="image-360" radius="10" src="#city"></a-sky>
 
       <!-- เพิ่มข้อความ -->
-      <a-text 
-        value="653380319-9 KANYAPORN PHIWNUAL sec2" 
-        position="-2 2 -4" <!-- วางไว้ทางซ้าย -->
-        color="white" 
-        align="center" 
-        width="6">
-      </a-text>
+      <a-text value="653380319-9 KANYAPORN PHIWNUAL sec2 " position="0 2 -4" color="white" align="center" width="6"></a-text>
 
       <!-- แสดงโมเดล 3D -->
       <a-entity 
-        gltf-model="#3d-model"  
-        scale="5 5 5"  <!-- ปรับขนาดใหญ่ -->
-        position="2 1 -4"  <!-- วางทางขวาของตัวหนังสือ -->
-        rotation="0 45 0">  
-      </a-entity>
+        gltf-model="#3d-model"  <!-- เชื่อมต่อกับโมเดลที่โหลด -->
+        scale="1 1 1"  <!-- ปรับขนาด -->
+        position="3 1 -4"  <!-- วางตำแหน่ง -->
+        rotation="0 0 0"  <!-- หมุน -->
+      ></a-entity>
 
       <!-- Link template we will build. -->
       <a-entity class="link"></a-entity>
@@ -54,3 +49,12 @@
     </a-scene>
   </body>
 </html>
+
+
+
+
+
+
+
+
+
