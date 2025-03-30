@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบออนไลน์</title>
+    <!-- Load React and Babel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        #root {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        .screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #E53935;
+            margin-bottom: 20px;
+        }
+
+        p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #E53935;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        button:hover {
+            background-color: #D32F2F;
+        }
+
+        button:active {
+            background-color: #C62828;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .question-container {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .option-label {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #f5f5f5;
+        }
+
+        .score-container {
+            text-align: center;
+            width: 100%;
+        }
+        
+        .loading-text {
+            text-align: center;
+            margin: 20px;
+            color: #E53935;
+        }
+        
+        .error-message {
+            color: #E53935;
+            text-align: center;
+            margin: 20px;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 5px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 600px) {
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            
+            .option-label {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .quiz-container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- React App -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        function QuizApp() {
+            const [questions, setQuestions] = useState([]);
+            const [currentScreen, setCurrentScreen] = useState('start');
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [answers, setAnswers] = useState([]);
+            const [score, setScore] = useState(0);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+
+            // โหลดคำถามจากไฟล์ quiz3.json
+            useEffect(() => {
+                setLoading(true);
+                
+                fetch('quiz3.json')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('ไม่สามารถโหลดไฟล์ quiz3.json ได้');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        setQuestions(data.questions);
+                        setLoading(false);
+                    })
+                    .catch(error => {
+                        console.error('Error loading questions:', error);
+                        setError(error.message);
+                        setLoading(false);
+                    });
+            }, []);
+
+            // เริ่มทำแบบทดสอบ
+            const startQuiz = () => {
+                setCurrentScreen('quiz');
+            };
+
+            // เลือกคำตอบ
+            const handleOptionSelect = (optionIndex) => {
+                const newAnswers = [...answers];
+                newAnswers[currentQuestionIndex] = optionIndex;
+                setAnswers(newAnswers);
+            };
+
+            // ไปยังคำถามถัดไป
+            const nextQuestion = () => {
+                // ตรวจสอบคำตอบและอัปเดตคะแนน
+                if (answers[currentQuestionIndex] === questions[currentQuestionIndex].correctAnswer) {
+                    setScore(score + 1);
+                }
+
+                setCurrentQuestionIndex(currentQuestionIndex + 1);
+            };
+
+            // ส่งคำตอบและแสดงผลลัพธ์
+            const submitQuiz = () => {
+                // ตรวจสอบคำตอบข้อสุดท้าย
+                if (answers[currentQuestionIndex] === questions[currentQuestionIndex].correctAnswer) {
+                    setScore(score + 1);
+                }
+
+                setCurrentScreen('result');
+            };
+
+            // เริ่มทำแบบทดสอบใหม่
+            const retryQuiz = () => {
+                setCurrentQuestionIndex(0);
+                setAnswers([]);
+                setScore(0);
+                setCurrentScreen('start');
+            };
+
+            // ตรวจสอบว่ามีการเลือกคำตอบหรือไม่
+            const isOptionSelected = () => {
+                return answers[currentQuestionIndex] !== undefined;
+            };
+
+            // แสดงข้อความกำลังโหลด
+            if (loading) {
+                return (
+                    <div className="quiz-container">
+                        <div className="loading-text">กำลังโหลดคำถาม...</div>
+                    </div>
+                );
+            }
+
+            // แสดงข้อความเมื่อเกิดข้อผิดพลาด
+            if (error) {
+                return (
+                    <div className="quiz-container">
+                        <div className="error-message">
+                            <h2>เกิดข้อผิดพลาด</h2>
+                            <p>{error}</p>
+                            <p>กรุณาตรวจสอบว่าไฟล์ quiz3.json อยู่ในตำแหน่งที่ถูกต้อง</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="quiz-container">
+                    {/* หน้าเริ่มต้น */}
+                    {currentScreen === 'start' && (
+                        <div className="screen">
+                            <h1>ยินดีต้อนรับสู่แบบทดสอบออนไลน์</h1>
+                            <p>เลือกคำถามและทำแบบทดสอบตามคำแนะนำ</p>
+                            <button onClick={startQuiz} disabled={questions.length === 0}>
+                                เริ่มทำแบบทดสอบ
+                            </button>
+                            {questions.length === 0 && <p>ไม่พบคำถามในไฟล์ quiz3.json</p>}
+                        </div>
+                    )}
+
+                    {/* หน้าแบบทดสอบ */}
+                    {currentScreen === 'quiz' && questions.length > 0 && (
+                        <div className="screen">
+                            <div className="question-container">
+                                <p>{questions[currentQuestionIndex].question}</p>
+                                {questions[currentQuestionIndex].options.map((option, index) => (
+                                    <label key={index} className="option-label">
+                                        <input
+                                            type="radio"
+                                            name={`question${currentQuestionIndex}`}
+                                            value={index}
+                                            checked={answers[currentQuestionIndex] === index}
+                                            onChange={() => handleOptionSelect(index)}
+                                        />
+                                        {' ' + option}
+                                    </label>
+                                ))}
+                            </div>
+
+                            {currentQuestionIndex < questions.length - 1 ? (
+                                <button 
+                                    onClick={nextQuestion} 
+                                    disabled={!isOptionSelected()}
+                                >
+                                    ถัดไป
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={submitQuiz} 
+                                    disabled={!isOptionSelected()}
+                                >
+                                    ตรวจคำตอบ
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    {/* หน้าผลลัพธ์ */}
+                    {currentScreen === 'result' && (
+                        <div className="screen">
+                            <div className="score-container">
+                                <h2>คะแนนที่ได้: <span>{score}</span> / <span>{questions.length}</span></h2>
+                                <button onClick={retryQuiz}>เริ่มใหม่</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // เรนเดอร์แอปพลิเคชัน
+        ReactDOM.render(<QuizApp />, document.getElementById('root'));
+    </script>
+
+</body>
+</html>
